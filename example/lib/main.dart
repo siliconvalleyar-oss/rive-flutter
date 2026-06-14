@@ -1,10 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:rive_example/advanced/advanced.dart';
 import 'package:rive_example/colors.dart';
 import 'package:rive_example/examples/examples.dart';
 import 'package:rive/rive.dart' as rive;
+import 'package:flutter_animate/flutter_animate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +17,7 @@ void main() async {
     MaterialApp(
       title: 'Rive Example',
       home: const RiveExampleApp(),
+      debugShowCheckedModeBanner: false,
       // showPerformanceOverlay: true,
       darkTheme: ThemeData(
         fontFamily: 'JetBrainsMono',
@@ -140,110 +144,153 @@ class _RiveExampleAppState extends State<RiveExampleApp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Rive Examples')),
-      body: Column(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text('Rive Examples'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Stack(
         children: [
-          Expanded(
-            child: Scrollbar(
-              controller: _scrollController,
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.all(8.0),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        // Calculate which section and item we're at
-                        int itemIndex = index;
-
-                        for (int i = 0; i < _sections.length; i++) {
-                          if (itemIndex == 0) {
-                            // This is a section header
-                            return _SectionHeader(_sections[i].title);
-                          }
-                          itemIndex--;
-
-                          if (itemIndex < _sections[i].pages.length) {
-                            // This is a page within the current section
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: _NavButton(
-                                page: _sections[i].pages[itemIndex],
-                              ),
-                            );
-                          }
-                          itemIndex -= _sections[i].pages.length;
-                        }
-
-                        return null;
-                      }, childCount: _getTotalItemCount()),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          // Decorative liquid wave background
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 200,
+            child: _LiquidWaveBackground(),
           ),
-          const SizedBox(height: 16),
-          ColoredBox(
-            color: Colors.black,
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                const Text(
-                  'Factory to use:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 16,
-                    runSpacing: 8,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Radio<RiveFactoryToUse>(
-                            value: RiveFactoryToUse.rive,
-                            groupValue: RiveExampleApp.factoryToUse,
-                            onChanged: (value) {
-                              setState(() {
-                                RiveExampleApp.factoryToUse =
-                                    value as RiveFactoryToUse;
-                              });
-                            },
-                          ),
-                          const Text(
-                            'Rive Renderer',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Radio<RiveFactoryToUse>(
-                            value: RiveFactoryToUse.flutter,
-                            groupValue: RiveExampleApp.factoryToUse,
-                            onChanged: (value) {
-                              setState(() {
-                                RiveExampleApp.factoryToUse =
-                                    value as RiveFactoryToUse;
-                              });
-                            },
-                          ),
-                          const Text(
-                            'Flutter Renderer',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ],
+          Column(
+            children: [
+              Expanded(
+                child: Scrollbar(
+                  controller: _scrollController,
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.only(
+                            left: 8.0, right: 8.0, top: 80),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate((context, index) {
+                            int itemIndex = index;
+                            int globalButtonIndex = 0;
+
+                            for (int i = 0; i < _sections.length; i++) {
+                              if (itemIndex == 0) {
+                                return _SectionHeader(_sections[i].title)
+                                    .animate()
+                                    .fadeIn(
+                                        duration: 400.ms,
+                                        delay: (i * 100).ms)
+                                    .slideX(
+                                        begin: -0.05,
+                                        end: 0,
+                                        duration: 400.ms,
+                                        delay: (i * 100).ms);
+                              }
+                              itemIndex--;
+
+                              if (itemIndex < _sections[i].pages.length) {
+                                final page = _sections[i].pages[itemIndex];
+                                final btn = Padding(
+                                  padding:
+                                      const EdgeInsets.only(bottom: 16.0),
+                                  child: _NavButton(page: page),
+                                );
+                                final btnWidget = btn
+                                    .animate()
+                                    .fadeIn(
+                                        duration: 400.ms,
+                                        delay: (globalButtonIndex * 60).ms)
+                                    .slideY(
+                                        begin: 0.15,
+                                        end: 0,
+                                        duration: 400.ms,
+                                        curve: Curves.easeOutCubic,
+                                        delay: (globalButtonIndex * 60).ms)
+                                    .scale(
+                                        begin: const Offset(0.95, 0.95),
+                                        end: const Offset(1.0, 1.0),
+                                        duration: 400.ms,
+                                        delay: (globalButtonIndex * 60).ms,
+                                        curve: Curves.easeOutCubic);
+                                globalButtonIndex++;
+                                return btnWidget;
+                              }
+                              itemIndex -= _sections[i].pages.length;
+                            }
+                            return null;
+                          }, childCount: _getTotalItemCount()),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              ColoredBox(
+                color: Colors.black,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Factory to use:',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 16,
+                        runSpacing: 8,
+                        children: [
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio<RiveFactoryToUse>(
+                                value: RiveFactoryToUse.rive,
+                                groupValue: RiveExampleApp.factoryToUse,
+                                onChanged: (value) {
+                                  setState(() {
+                                    RiveExampleApp.factoryToUse =
+                                        value as RiveFactoryToUse;
+                                  });
+                                },
+                              ),
+                              const Text(
+                                'Rive Renderer',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio<RiveFactoryToUse>(
+                                value: RiveFactoryToUse.flutter,
+                                groupValue: RiveExampleApp.factoryToUse,
+                                onChanged: (value) {
+                                  setState(() {
+                                    RiveExampleApp.factoryToUse =
+                                        value as RiveFactoryToUse;
+                                  });
+                                },
+                              ),
+                              const Text(
+                                'Flutter Renderer',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -387,29 +434,91 @@ class _NavButtonState extends State<_NavButton> {
         _removeOverlay();
       },
       child: Center(
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _isHovered ? primaryColor.withOpacity(0.1) : null,
-            elevation: _isHovered ? 8 : 2,
+        child: AnimatedContainer(
+          duration: 300.ms,
+          curve: Curves.easeInOut,
+          width: 300,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: _isHovered
+                ? LinearGradient(
+                    colors: [
+                      primaryColor.withOpacity(0.2),
+                      primaryColor.withOpacity(0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
           ),
-          child: SizedBox(
-            width: 300,
-            child: Center(
-              child: Text(
-                widget.page.name,
-                style: Theme.of(context).textTheme.labelLarge,
+          child: Material(
+            color: Colors.transparent,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(
+                    sigmaX: _isHovered ? 12 : 6,
+                    sigmaY: _isHovered ? 12 : 6),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _isHovered
+                          ? primaryColor.withOpacity(0.5)
+                          : primaryColor.withOpacity(0.15),
+                    ),
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isHovered
+                          ? primaryColor.withOpacity(0.15)
+                          : primaryColor.withOpacity(0.05),
+                      elevation: _isHovered ? 8 : 2,
+                      shadowColor: primaryColor.withOpacity(0.3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 14),
+                    ),
+                    child: Text(
+                      widget.page.name,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: _isHovered
+                                ? primaryColor
+                                : Colors.white.withOpacity(0.85),
+                          ),
+                    ),
+                    onPressed: () {
+                      _removeOverlay();
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder<void>(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  _WrappedPage(page: widget.page),
+                          transitionsBuilder: (context, animation,
+                              secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: ScaleTransition(
+                                scale: Tween<double>(begin: 0.95, end: 1.0)
+                                    .animate(CurvedAnimation(
+                                        parent: animation,
+                                        curve: Curves.easeOutCubic)),
+                                child: child,
+                              ),
+                            );
+                          },
+                          transitionDuration: 350.ms,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
-          onPressed: () {
-            _removeOverlay();
-            Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) => _WrappedPage(page: widget.page),
-              ),
-            );
-          },
         ),
       ),
     );
@@ -429,4 +538,96 @@ class _WrappedPage extends StatelessWidget {
       body: page.page,
     );
   }
+}
+
+/// Decorative liquid wave background using sine deformation.
+class _LiquidWaveBackground extends StatefulWidget {
+  @override
+  State<_LiquidWaveBackground> createState() => _LiquidWaveBackgroundState();
+}
+
+class _LiquidWaveBackgroundState extends State<_LiquidWaveBackground>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: 3000.ms,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: _LiquidWavePainter(phase: _controller.value * 2 * math.pi),
+          size: Size.infinite,
+        );
+      },
+    );
+  }
+}
+
+class _LiquidWavePainter extends CustomPainter {
+  final double phase;
+
+  _LiquidWavePainter({required this.phase});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          primaryColor.withOpacity(0.3),
+          primaryColor.withOpacity(0.05),
+          Colors.transparent,
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    final path = Path();
+    path.moveTo(0, size.height);
+
+    for (double x = 0; x <= size.width; x++) {
+      final y = math.sin((x / size.width) * 2 * math.pi * 1.5 + phase) * 20 +
+          math.sin((x / size.width) * 4 * math.pi + phase * 1.5) * 8 +
+          size.height * 0.5;
+      path.lineTo(x, y);
+    }
+
+    path.lineTo(size.width, size.height);
+    path.close();
+    canvas.drawPath(path, paint);
+
+    // Glow pass
+    final glowPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          primaryColor.withOpacity(0.15),
+          primaryColor.withOpacity(0.02),
+          Colors.transparent,
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
+
+    canvas.drawPath(path, glowPaint);
+  }
+
+  @override
+  bool shouldRepaint(_LiquidWavePainter oldDelegate) =>
+      oldDelegate.phase != phase;
 }
