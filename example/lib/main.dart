@@ -58,21 +58,11 @@ class _RiveExampleAppState extends State<RiveExampleApp> {
   // ScrollController for the CustomScrollView
   final ScrollController _scrollController = ScrollController();
 
-  // Examples organized into sections
+  // Examples organized into sections — curated selection
   final _sections = [
     const _Section('Getting Started', [
       _Page(
-        'Rive Widget',
-        ExampleRiveWidget(),
-        'Simple example usage of the Rive widget with common parameters.',
-      ),
-      _Page(
-        'Rive Widget Builder',
-        ExampleRiveWidgetBuilder(),
-        'Example usage of the Rive builder widget with common parameters.',
-      ),
-      _Page(
-        'Rive Panel [Shared Texture]',
+        'Shared Texture',
         ExampleRivePanel(),
         'Example usage of the Shared Texture View widget.',
       ),
@@ -84,37 +74,6 @@ class _RiveExampleAppState extends State<RiveExampleApp> {
       ),
     ]),
     const _Section('Rive Features', [
-      _Page(
-        'Demo Scripting',
-        DemoScripting(),
-        'Example Rive file with scripting.',
-      ),
-      _Page(
-        'Data Binding',
-        ExampleDataBinding(),
-        'Example using Rive data binding at runtime.',
-      ),
-      _Page(
-        'Data Binding - Images',
-        ExampleDataBindingImages(),
-        'Example using Rive data binding images at runtime.',
-      ),
-      _Page(
-        'Data Binding - Artboards',
-        ExampleDataBindingArtboards(),
-        'Example using Rive data binding artboards at runtime.',
-      ),
-      _Page(
-        'Data Binding - Lists',
-        ExampleDataBindingLists(),
-        'Example using Rive data binding lists at runtime.',
-      ),
-      _Page(
-        'Responsive Layouts',
-        ExampleResponsiveLayouts(),
-        'Create responsive Rive graphics that adapt to screen size.',
-      ),
-      _Page('Events', ExampleEvents(), 'Handle Rive events.'),
       _Page('Audio', ExampleRiveAudio(), 'Example Rive file with audio.'),
     ]),
     const _Section('Asset Loading', [
@@ -141,26 +100,12 @@ class _RiveExampleAppState extends State<RiveExampleApp> {
     ]),
     const _Section('Painters [Advanced]', [
       _Page(
-        'State Machine Painter',
-        ExampleStateMachinePainter(),
-        'Advanced: Custom painter for state machines.',
-      ),
-      _Page(
         'Single Animation Painter',
         ExampleSingleAnimationPainter(),
         'Advanced: Custom painter for single animation playback.',
       ),
-      _Page('Centaur Game', CentaurGameWidget(), 'Advanced: Centaur Game.'),
     ]),
     const _Section('Flutter Concepts/Integration', [
-      // _Page('Flutter Lists', Todo(),
-      //     'Integrate Rive graphics with Flutter list widgets.'),
-      _Page('Pause/Play', ExamplePausePlay(), 'Pause and play Rive graphics.'),
-      _Page(
-        'Flutter Hit Test + Cursor Behaviour',
-        ExampleHitTestBehaviour(),
-        'Specifying hit test and cursor behaviour.',
-      ),
       _Page(
         'Flutter Ticker Mode',
         ExampleTickerMode(),
@@ -170,36 +115,6 @@ class _RiveExampleAppState extends State<RiveExampleApp> {
         'Flutter Time Dilation',
         ExampleTimeDilation(),
         'Rive graphics respect Flutter time dilation.',
-      ),
-      _Page(
-        'Flutter Transform',
-        ExampleTransform(),
-        'Rive graphics respect Flutter transform.',
-      ),
-      _Page(
-        'Flutter Multi Touch',
-        ExampleMultiTouch(),
-        'Rive graphics respect Flutter multi touch.',
-      ),
-      // _Page('Flutter Hero Transitions', Todo(),
-      //     'Create smooth transitions between pages with Rive graphics.'),
-      // _Page('Flutter State Management', Todo(),
-      //     'Manage Rive state with Flutter state management.'),
-      // _Page('Flutter Localization', Todo(),
-      //     'Localize Rive graphics for different languages.'),
-      // _Page('Flutter Internationalization', Todo(),
-      //     'Internationalize Rive graphics with Flutter i18n.'),
-    ]),
-    const _Section('Performance/Memory testing', [
-      _Page(
-        'Graphic resizing test',
-        TestGraphicResizing(),
-        'Test graphic resizing texture creation (flicker on resize).',
-      ),
-      _Page(
-        'Memory cleanup test',
-        TestMemoryCleanup(),
-        'Test memory cleanup by toggling the visibility of a Rive file widget.',
       ),
     ]),
     const _Section('Legacy Features [Use data binding instead]', [
